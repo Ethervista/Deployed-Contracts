@@ -155,12 +155,11 @@ interface IEtherVistaPair {
     function initialize(address _token0, address _token1) external;
 }
 
-
 contract HARDSTAKE is ReentrancyGuard {
     IERC20 public immutable stakingToken;
     address StakingTokenAddress;
 
-    uint256 public constant LOCK_TIME = 21 days;
+    uint256 public constant LOCK_TIME = 14 days;
     uint256 private bigNumber = 10**20;
     uint256 public totalCollected = 0;
     uint256 public poolBalance = 0;
@@ -204,6 +203,12 @@ contract HARDSTAKE is ReentrancyGuard {
         priceFeed = AggregatorV3Interface(_oracleAddress);
         costSetter = msg.sender;
         factory = _factory;
+    }
+
+    receive() external payable {
+        poolBalance += msg.value;
+        totalCollected += msg.value;
+        updateEuler(msg.value);
     }
 
     function setCost(uint256 _cost) external {
